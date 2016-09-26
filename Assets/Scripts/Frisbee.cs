@@ -28,7 +28,7 @@ public class Frisbee : MonoBehaviour
 
         transform.position = startPosition + this.velocity * time + new Vector3(0, -gravetyConstant * time * time * 0.5f, 0);//position with gravety only
 
-        transform.Rotate(new Vector3(0, 90, 0) * dt);//TEST: denna gör rotation med 90 grader per sekund
+        transform.Rotate(new Vector3(0, 100, 0) * dt);//TEST: denna gör rotation med 90 grader per sekund
 
 
         //ass
