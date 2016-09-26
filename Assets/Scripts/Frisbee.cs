@@ -31,6 +31,7 @@ public class Frisbee : MonoBehaviour
         transform.Rotate(new Vector3(0, 100, 0) * dt);//TEST: denna gör rotation med 90 grader per sekund
 
 
+
         //ass
     }
 }
