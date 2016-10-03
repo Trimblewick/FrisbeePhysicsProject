@@ -4,8 +4,8 @@ using System.Collections;
 public class Frisbee : MonoBehaviour
 {
     public Vector3 velocity;        //velocity and also direction
-    public float AoA = 2f;          //Angle of attack
-    public float A0 = -4f;          //initial angle
+    public float AoA;          //Angle of attack
+    public float A0;          //initial angle
 
     private float time;             //elapsed time from start of the throw
     private Vector3 startPosition;  //position at start of the throw
@@ -38,7 +38,7 @@ public class Frisbee : MonoBehaviour
 
         // transform.position = startPosition + this.velocity * time + new Vector3(0, -g * time * time * 0.5f, 0);//position with gravity only
         this.velocity = this.velocity + new Vector3(-Fd * dt, (Fl - g) * dt, -Fd * dt); //change to being negative compared to current x and z speeds
-        transform.position = startPosition + this.velocity * dt;
+        transform.position = transform.position + this.velocity * dt;
 
         transform.Rotate(new Vector3(0, 100, 0) * dt);//TEST: denna gör rotation med 90 grader per sekund
 
