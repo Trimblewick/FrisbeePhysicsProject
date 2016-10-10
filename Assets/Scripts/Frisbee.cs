@@ -17,7 +17,7 @@ public class Frisbee : MonoBehaviour
     private const float height = 0.02f;     //test height
     private const float Cl_0 = 0.1f;        //Cl at angle 0
     private const float Cd_0 = 0.08f;       //Cd at angle 0
-    private const float Cl_a = 1.4f;        //Cl dependent on angle
+    private const float Cl_a = 1.0f;        //Cl dependent on angle
     private const float Cd_a = 2.72f;       //Cd dependent on angle
     private const float g = 9.82f;          //Gravitational constant
     private const float airDensity = 1.23f; //average air density at sealevel (kg/m^3)
@@ -52,7 +52,7 @@ public class Frisbee : MonoBehaviour
         transform.position = transform.position + this.velocity * dt;
 
         transform.Rotate(spin * dt);
-        this.spin -= new Vector3(0, 0.1f, 0); //temp siimultation of resistance on spin
+        this.spin -= spin * 0.1f; //temp siimultation of resistance on spin
 
 
 
