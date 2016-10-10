@@ -17,9 +17,9 @@ public class PlayerMovement : MonoBehaviour {
         this.movementDirection = transform.forward;
         
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
         
 
         float vertical = Input.GetAxis("Vertical");
@@ -27,19 +27,20 @@ public class PlayerMovement : MonoBehaviour {
 
         float cameraRotationScalar = Input.GetAxis("Mouse X");
 
-        this.movementDirection = new Vector3(horizontal, 0, vertical);
+        this.movementDirection = vertical * new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z).normalized 
+            + horizontal * playerCamera.transform.right.normalized; 
 
         Vector3 movementPosTransform = new Vector3(0, 0, 0);
 
-        if (movementDirection.magnitude > 0.7)
+        if (movementDirection.magnitude > 0.81)
         {
             this.anim.Play("Run");
-            movementPosTransform = movementDirection.normalized * speed * 7 * Time.deltaTime;
+            movementPosTransform = movementDirection.normalized * speed * 6 * Time.deltaTime;
             this.transform.position += movementPosTransform;
             this.playerCamera.transform.position += movementPosTransform;
             this.transform.forward = this.movementDirection.normalized;
         }
-        else if(movementDirection.magnitude > 0.1 && movementDirection.magnitude < 0.7)
+        else if(movementDirection.magnitude > 0.1 && movementDirection.magnitude < 0.81)
         {
             this.anim.Play("Walk");
             movementPosTransform = movementDirection.normalized * speed * Time.deltaTime;
@@ -56,7 +57,7 @@ public class PlayerMovement : MonoBehaviour {
         {
             this.playerCamera.transform.LookAt(new Vector3(this.transform.position.x, this.transform.position.y + 1.3f, this.transform.position.z));
             
-            this.playerCamera.transform.RotateAround(this.transform.position, new Vector3(0, 1, 0), 30 * cameraRotationScalar);
+            this.playerCamera.transform.RotateAround(this.transform.position, new Vector3(0, 1, 0), 40 * cameraRotationScalar);
         }
 
         if (Input.GetKeyDown("1"))
