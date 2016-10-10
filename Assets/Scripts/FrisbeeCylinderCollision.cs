@@ -64,7 +64,7 @@ public class FrisbeeCylinderCollision : MonoBehaviour {
 
 
 
-                    frisbee.rotationTest = 4 * rotationLineOfAction * deltaV_p * 4;//4 * Mathf.Sin(0)*deltaV_p * 4;
+                    //frisbee.rotationTest = 4 * rotationLineOfAction * deltaV_p * 4;//4 * Mathf.Sin(0)*deltaV_p * 4;
                 }
             }
         }
