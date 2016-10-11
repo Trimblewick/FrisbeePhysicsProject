@@ -2,37 +2,51 @@
 using System.Collections;
 
 public class FrisbeeBoxCollision : MonoBehaviour {
-
-    private Vector3 [] boxCorners = new Vector3[8];
+    
 
     private Frisbee frisbee;
 
-	// Use this for initialization
-	void Start () {
+    float Dot(Vector3 v1, Vector3 v2)
+    {
+        return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    }
+
+    // Use this for initialization
+    void Start () {
         frisbee = FindObjectOfType<Frisbee>();//get the frisbee object
-
-        boxCorners[0] = new Vector3(transform.position.x - 1, transform.position.y - 1, transform.position.z - 1);
-        boxCorners[1] = new Vector3(transform.position.x - 1, transform.position.y - 1, transform.position.z + 1);
-        boxCorners[2] = new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z - 1);
-        boxCorners[3] = new Vector3(transform.position.x - 1, transform.position.y + 1, transform.position.z + 1);
-        boxCorners[4] = new Vector3(transform.position.x + 1, transform.position.y - 1, transform.position.z - 1);
-        boxCorners[5] = new Vector3(transform.position.x + 1, transform.position.y - 1, transform.position.z + 1);
-        boxCorners[6] = new Vector3(transform.position.x + 1, transform.position.y + 1, transform.position.z - 1);
-        boxCorners[7] = new Vector3(transform.position.x + 1, transform.position.y + 1, transform.position.z + 1);
-
         
 
     }
 	
 	// Update is called once per frame
 	void Update () {
-        bool outsidebox = true;
-        for (int i = 0; i < 8 && outsidebox; i++)
+
+        Vector3 BoxToFrisbee = frisbee.transform.position - this.transform.position;
+        float[] lengths = new float[3];
+        lengths[0] = Vector3.Dot(this.transform.forward, BoxToFrisbee);
+        lengths[1] = Vector3.Dot(this.transform.right, BoxToFrisbee);
+        lengths[2] = Vector3.Dot(this.transform.up, BoxToFrisbee);
+        float[] absLengths = new float[3];
+        absLengths[0] = Mathf.Abs(lengths[0]);
+        absLengths[0] = Mathf.Abs(lengths[1]);
+        absLengths[0] = Mathf.Abs(lengths[2]);
+        
+
+        if (absLengths[0] < this.transform.localScale.z * 0.5f && absLengths[1] < this.transform.localScale.x * 0.5f && absLengths[2] < this.transform.localScale.y * 0.5f)
         {
-           // if ((frisbee.transform.position - boxCorners[0]).magnitude > 1)
-            {
-                outsidebox = false;
-            }
+            Vector3 collisionNormal;
+            if (absLengths[0] > absLengths[1] && absLengths[0] > absLengths[2])
+                collisionNormal = lengths[0] > 0 ? this.transform.forward : -this.transform.forward;
+            else if (absLengths[1] > absLengths[0] && absLengths[1] > absLengths[2])
+                collisionNormal = lengths[1] > 0 ? this.transform.right : -this.transform.right;
+            else
+                collisionNormal = lengths[2] > 0 ? this.transform.up : -this.transform.up;
+            //frisbee.velocity.z = 0;// frisbee.velocity.magnitude * collisionNormal;
+            Debug.Log(collisionNormal);
+            Debug.Log("kekeke");
         }
+
+        
+
 	}
 }
