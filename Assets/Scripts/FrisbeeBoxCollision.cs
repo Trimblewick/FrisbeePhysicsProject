@@ -4,6 +4,10 @@ using System.Collections;
 public class FrisbeeBoxCollision : MonoBehaviour {
     
     private Frisbee frisbee;
+    private const float e = 1.0f;//collision coefficient
+
+    private const float my = 0.1f;//friction coefficient
+
 
     float Dot(Vector3 v1, Vector3 v2)
     {
@@ -36,16 +40,27 @@ public class FrisbeeBoxCollision : MonoBehaviour {
             {
                 if (absLengths[2] < this.transform.localScale.y * 0.5f)
                 {
-                    Vector3 collisionNormal;
+                    Vector3 lineOfAction;
+                    Vector3 e_n;//friction direction
                     if (absLengths[0] > absLengths[1] && absLengths[0] > absLengths[2])
-                        collisionNormal = lengths[0] > 0 ? this.transform.forward : -this.transform.forward;
+                    {
+                        lineOfAction = lengths[0] > 0 ? this.transform.forward : -this.transform.forward;
+
+                    }
                     else if (absLengths[1] > absLengths[0] && absLengths[1] > absLengths[2])
-                        collisionNormal = lengths[1] > 0 ? this.transform.right : -this.transform.right;
+                        lineOfAction = lengths[1] > 0 ? this.transform.right : -this.transform.right;
                     else
-                        collisionNormal = lengths[2] > 0 ? this.transform.up : -this.transform.up;
+                        lineOfAction = lengths[2] > 0 ? this.transform.up : -this.transform.up;
 
+                    e_n = Vector3.Cross(lineOfAction, frisbee.spin.normalized);
+                    float V_p = Vector3.Dot(frisbee.velocity, lineOfAction.normalized);
+                    float U_p = -e * V_p;
+                    float deltaVU_p = U_p - V_p;
 
-                    frisbee.velocity = frisbee.velocity.magnitude * collisionNormal;//fake
+                    float V_n = Vector3.Dot(frisbee.velocity, e_n) - frisbee.spin.magnitude * frisbee.getRadius() * 0.5f;
+
+                    frisbee.velocity += deltaVU_p * lineOfAction.normalized + V_n * e_n;
+                    
                     
                 }
             }

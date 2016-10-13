@@ -5,7 +5,7 @@ using System.Collections;
 public class Frisbee : MonoBehaviour
 {
     public Vector3 velocity;        //velocity and also direction
-    public Vector3 spin;            //Speed of rotation (0, 100, 0) is 90° (PI/2) per second
+    public Vector3 spin;            //Speed of rotation
     public float AoA;               //Angle of attack
     public float A0;                //initial angle
 
@@ -14,7 +14,7 @@ public class Frisbee : MonoBehaviour
 
     private const float mass = 0.175f;      //standard weight for frisbee according to USA ultimate
     private const float area = 0.0568f;     //standard area                -  ||  -
-    public float radius = 0.1345f;   //standard radius
+    private const float radius = 0.1345f;   //standard radius
     private const float height = 0.02f;     //test height
     private const float Cl_0 = 0.1f;        //Cl at angle 0
     private const float Cd_0 = 0.08f;       //Cd at angle 0
@@ -23,23 +23,26 @@ public class Frisbee : MonoBehaviour
     private const float g = 9.82f;          //Gravitational constant
     private const float airDensity = 1.23f; //average air density at sealevel (kg/m^3)
 
-
+    public float getRadius()
+    {
+        return radius;
+    }
 	// Use this for initialization
 	void Start () {
-        
+        this.spin = -this.spin;
     }
 	
 	// Update is called once per frame
 	void Update () {
         float dt = Time.deltaTime;
 
-        time += dt;
+        time += Time.deltaTime;
 
         float Cl = Cl_0 + Cl_a * (AoA * Mathf.PI / 180); // Cl = Cl0 + Cl(angle)
         float Cd = Cd_0 + Cd_a * (Mathf.Pow((AoA - A0) * Mathf.PI / 180, 2));
         float Fl = airDensity * area * Cl * this.velocity.sqrMagnitude * 0.5f;  //F = ½pACv^2
         float Fd = airDensity * area * Cd * this.velocity.sqrMagnitude * 0.5f;  //  -||-
-        float G = 2 * Mathf.PI * Mathf.Pow(radius, 2) * spin.y * 0.9f /*refer to comment on vector3 spin*/ * Mathf.PI / 180; //vortex established by rotation
+        float G = 2 * Mathf.PI * Mathf.Pow(radius, 2) * spin.y * Mathf.PI / 180; //vortex established by rotation
         float Fm = airDensity * Mathf.Sqrt(velocity.sqrMagnitude) * G * height; //F = density * v * G * l for a cylinder according to NASA
         //note: multiplying with PI / 180 converts degrees to radians
 
@@ -50,9 +53,10 @@ public class Frisbee : MonoBehaviour
 
         this.velocity = this.velocity + drag + lift + magnus;
         transform.position = transform.position + this.velocity * dt;
+        
 
-        transform.Rotate(spin * dt);
-        this.spin -= spin * 0.1f; //temp siimultation of resistance on spin
+        transform.RotateAround(this.spin, this.spin.magnitude * dt);// Rotate(spin * dt);
+        //this.spin -= spin * 0.1f; //temp siimultation of resistance on spin
 
         //ass
 	}
