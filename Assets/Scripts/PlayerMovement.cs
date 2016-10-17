@@ -14,10 +14,12 @@ public class PlayerMovement : MonoBehaviour {
 
     public GameObject hand;
     private bool pickedUpFrisbee;
-    private bool aiming;
-    public GameObject aimSphere;
+    
     private Vector3 moveToHellPos = new Vector3(50, -50, 50);
 
+
+    public LineRenderer lineRenderer;
+    private Vector3 endOfLine;
     // Use this for initialization
     void Start () {
         this.playerCamera = FindObjectOfType<Camera>();
@@ -25,8 +27,9 @@ public class PlayerMovement : MonoBehaviour {
         this.movementDirection = transform.forward;
         frisbee = FindObjectOfType<Frisbee>();//get the frisbee object
         pickedUpFrisbee = false;
-        this.aiming = false;
-        this.aimSphere.transform.position = hand.transform.position;// moveToHellPos;
+        this.lineRenderer.SetPosition(0, hand.transform.position);// moveToHellPos;
+        this.endOfLine = hand.transform.position;
+        this.lineRenderer.SetPosition(1, endOfLine);
         
     }
 
@@ -79,29 +82,32 @@ public class PlayerMovement : MonoBehaviour {
         }
         if (this.pickedUpFrisbee)
         {
-            frisbee.transform.position = hand.transform.position;
             this.anim.Play("FightStance");
+            frisbee.transform.position = hand.transform.position;
+            
 
-            /*if (Input.GetButton("Aim"))
+            if (Input.GetButton("Aim"))
             {
-                this.aiming = true;*/
-                /*this.aimCylinder.transform.RotateAround(hand.transform.position, this.playerCamera.transform.right, vertical * 90.0f);
-                this.aimCylinder.transform.localScale = new Vector3(this.aimCylinder.transform.localScale.x, -cameraRotationScalar2 * 10, this.aimCylinder.transform.localScale.z);
-                this.aimCylinder.transform.position = new Vector3(hand.transform.position.x, hand.transform.position.y + this.aimCylinder.transform.localScale.y, hand.transform.position.z);
-                */
-                //this.aimSphere.transform.position += new Vector3(horizontal, -cameraRotationScalar2 * 10, vertical);
+                this.lineRenderer.SetPosition(0, this.hand.transform.position);
+                endOfLine += vertical * new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z).normalized * Time.deltaTime
+                + horizontal * playerCamera.transform.right.normalized * Time.deltaTime - new Vector3(0, cameraRotationScalar2 * 10.0f, 0) * Time.deltaTime;
+                this.lineRenderer.SetPosition(1, endOfLine);
+
+                Vector3 throwDirection = endOfLine - hand.transform.position;
+
+                float powerOfThrow = 10.0f;
 
                 if (Input.GetButtonDown("Fire1"))
                 {
-                    frisbee.velocity = this.playerCamera.transform.forward * 10;//movementDirection.normalized;
+                    frisbee.velocity = throwDirection * powerOfThrow;
+                    frisbee.spin = new Vector3(0, -50, 0);
                     this.pickedUpFrisbee = false;
                 
                 }
-            //}
+            }
             else
             {
-                //this.aimSphere.transform.position = this.moveToHellPos;
-                aiming = false;
+                this.endOfLine = this.hand.transform.position;
             }
             if (Input.GetButtonDown("Fire2"))
             {
@@ -117,7 +123,7 @@ public class PlayerMovement : MonoBehaviour {
                 float playerDistanceToFrisbee = (frisbee.transform.position - this.transform.position).magnitude;
                 if (playerDistanceToFrisbee < 1.5f)
                 {
-                    //frisbee.spin = new Vector3(0, 0, 0);
+                    frisbee.spin = new Vector3(0, 0, 0);
                     this.pickedUpFrisbee = true;
                 }
                 else
