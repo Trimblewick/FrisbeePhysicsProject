@@ -6,7 +6,7 @@ public class FrisbeeCylinderCollision : MonoBehaviour {
     
     public float radius;
     public float stemHeight;
-    private const float e = 1.0f;//collision coefficient
+    private const float e = 0.4f;//collision coefficient
     //private Vector3 e_n;//normalized direction of friction
     private const float my = 0.1f;//friction coefficient
 
@@ -47,7 +47,7 @@ public class FrisbeeCylinderCollision : MonoBehaviour {
                 if (frisbee.transform.position.y + frisbee.getRadius() * Mathf.Sin(0)/* * sinus of frisbee.angleOfAttack*/< this.transform.position.y + stemHeight)
                 {
                     //Object and frisbee have collided
-                    Vector3 moveFactor = this.transform.position - lineOfAction.normalized * (this.radius + frisbee.getRadius() + 0.01f);
+                    Vector3 moveFactor = this.transform.position - (lineOfAction.normalized * (this.radius + frisbee.getRadius() + 0.01f));
                     frisbee.transform.position = new Vector3(moveFactor.x, frisbee.transform.position.y, moveFactor.z);
 
                     Vector3 e_n = Vector3.Cross(lineOfAction.normalized, frisbee.spin.normalized).normalized;//friction direction

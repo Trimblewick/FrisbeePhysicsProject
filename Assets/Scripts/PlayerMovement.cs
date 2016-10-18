@@ -36,7 +36,7 @@ public class PlayerMovement : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-
+        //frisbee.idle = pickedUpFrisbee;
 
         float vertical = Input.GetAxis("Vertical");
         float horizontal = Input.GetAxis("Horizontal");
@@ -82,12 +82,14 @@ public class PlayerMovement : MonoBehaviour {
         }
         if (this.pickedUpFrisbee)
         {
-            this.anim.Play("FightStance");
             frisbee.transform.position = hand.transform.position;
+            this.anim.Play("FightStance");
+            
             
 
             if (Input.GetButton("Aim"))
             {
+                //draw aimline
                 this.lineRenderer.SetPosition(0, this.hand.transform.position);
                 endOfLine += vertical * new Vector3(playerCamera.transform.forward.x, 0, playerCamera.transform.forward.z).normalized * Time.deltaTime
                 + horizontal * playerCamera.transform.right.normalized * Time.deltaTime - new Vector3(0, cameraRotationScalar2 * 10.0f, 0) * Time.deltaTime;
@@ -100,24 +102,31 @@ public class PlayerMovement : MonoBehaviour {
                 if (Input.GetButtonDown("Fire1"))
                 {
                     frisbee.velocity = throwDirection * powerOfThrow;
-                    frisbee.spin = new Vector3(0, -50, 0);
+                    frisbee.spin = new Vector3(0, -20, 0);
                     this.pickedUpFrisbee = false;
+                    frisbee.idle = false;
                 
                 }
             }
             else
             {
-                this.endOfLine = this.hand.transform.position;
+                
             }
             if (Input.GetButtonDown("Fire2"))
             {
                 //drop frisbee
                 frisbee.velocity = new Vector3(0, 0, 0);
                 this.pickedUpFrisbee = false;
+                frisbee.idle = false;
             }
         }
         else
         {
+            //reset aimline
+            this.lineRenderer.SetPosition(0, this.hand.transform.position);
+            this.endOfLine = this.hand.transform.position;
+            this.lineRenderer.SetPosition(1, endOfLine);
+
             if (Input.GetButtonDown("Fire2"))
             {
                 float playerDistanceToFrisbee = (frisbee.transform.position - this.transform.position).magnitude;
@@ -125,6 +134,7 @@ public class PlayerMovement : MonoBehaviour {
                 {
                     frisbee.spin = new Vector3(0, 0, 0);
                     this.pickedUpFrisbee = true;
+                    
                 }
                 else
                 {
