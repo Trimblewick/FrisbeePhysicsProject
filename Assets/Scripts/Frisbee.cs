@@ -7,7 +7,6 @@ public class Frisbee : MonoBehaviour
     public Vector3 velocity;        //velocity and also direction
     public Vector3 spin;            //Speed of rotation
     public float AoA;               //Angle of attack
-    public float A0;                //constant dependent of frisbee make
     public bool idle;
     
     private Vector3 startPosition;  //position at start of the throw
@@ -22,7 +21,10 @@ public class Frisbee : MonoBehaviour
     private const float Cd_a = 2.72f;       //Cd dependent on angle
     private const float g = 9.82f;          //Gravitational constant
     private const float airDensity = 1.23f; //average air density at sealevel (kg/m^3)
+    private const float A0 = -4.0f;         //constant dependent of frisbee make
     private Vector3 wind;
+    public float windFactor;
+    public TextMesh windInfo;
 
     public float getRadius()
     {
@@ -32,7 +34,8 @@ public class Frisbee : MonoBehaviour
 	void Start () {
         this.spin = -this.spin;
         this.idle = false;
-        this.wind = new Vector3((Random.Range(-5f, 5f)), (Random.Range(-5f, 5f))*0.1f, (Random.Range(-5f, 5f)));
+        this.wind = new Vector3((Random.Range(-windFactor, windFactor)), (Random.Range(-windFactor, windFactor))*0.1f, (Random.Range(-windFactor, windFactor)));
+        windInfo.text = "Wind: " + wind;
     }
 	
 	// Update is called once per frame
@@ -41,8 +44,8 @@ public class Frisbee : MonoBehaviour
         {
             float dt = Time.deltaTime;
             Vector3 plane = new Vector3(velocity.x, 0, velocity.z);
-            this.AoA = Mathf.Acos(Vector3.Dot(plane.normalized, velocity.normalized));
-            Debug.Log(AoA);
+            this.AoA = -Mathf.Acos(Vector3.Dot(plane.normalized, velocity.normalized));
+            
             Vector3 u = this.velocity - this.wind;
             float Cl = Cl_0 + Cl_a * (AoA * Mathf.PI / 180); // Cl = Cl0 + Cl(angle)
             float Cd = Cd_0 + Cd_a * (Mathf.Pow((AoA - A0) * Mathf.PI / 180, 2));
@@ -57,8 +60,10 @@ public class Frisbee : MonoBehaviour
             Vector3 lift = new Vector3(0, ((Fl / mass) - g) * dt, 0); //lift as velocity
             Vector3 magnus = Fm * new Vector3(velocity.normalized.z, 0, -velocity.normalized.x) * dt / mass; // Fm * cross product between (0, 1, 0) and velocity magnus as velocity
 
+            this.spin *= Mathf.Exp(-0.1f * Time.deltaTime);
+
             this.velocity = this.velocity + drag + lift + magnus;
-            transform.position = transform.position + this.velocity * dt;
+            transform.position += this.velocity * dt;
 
             transform.RotateAround(this.spin, this.spin.magnitude * dt);
         }

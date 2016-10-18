@@ -17,9 +17,11 @@ public class PlayerMovement : MonoBehaviour {
     
     private Vector3 moveToHellPos = new Vector3(50, -50, 50);
 
-
+    public TextMesh velocityAndSpinnInfo;
     public LineRenderer lineRenderer;
     private Vector3 endOfLine;
+
+    float spinFactor;
     // Use this for initialization
     void Start () {
         this.playerCamera = FindObjectOfType<Camera>();
@@ -30,7 +32,7 @@ public class PlayerMovement : MonoBehaviour {
         this.lineRenderer.SetPosition(0, hand.transform.position);// moveToHellPos;
         this.endOfLine = hand.transform.position;
         this.lineRenderer.SetPosition(1, endOfLine);
-        
+        this.spinFactor = 0;
     }
 
     // Update is called once per frame
@@ -43,6 +45,8 @@ public class PlayerMovement : MonoBehaviour {
 
         float cameraRotationScalar = Input.GetAxis("Mouse X");
         float cameraRotationScalar2 = Input.GetAxis("Mouse Y");
+
+        float spinnIncrementer = Input.GetAxis("Fire3");
 
         
         if (!pickedUpFrisbee)
@@ -85,7 +89,6 @@ public class PlayerMovement : MonoBehaviour {
             frisbee.transform.position = hand.transform.position;
             this.anim.Play("FightStance");
             
-            
 
             if (Input.GetButton("Aim"))
             {
@@ -95,23 +98,35 @@ public class PlayerMovement : MonoBehaviour {
                 + horizontal * playerCamera.transform.right.normalized * Time.deltaTime - new Vector3(0, cameraRotationScalar2 * 10.0f, 0) * Time.deltaTime;
                 this.lineRenderer.SetPosition(1, endOfLine);
 
-                Vector3 throwDirection = endOfLine - hand.transform.position;
-
                 float powerOfThrow = 10.0f;
+                Vector3 throwDirection = endOfLine - hand.transform.position;
+                Vector3 velocityModifier = throwDirection * powerOfThrow;
+
+                if (spinnIncrementer == 1)
+                {
+                    this.spinFactor += 10;
+                }
+                else if (spinnIncrementer == -1)
+                {
+                    this.spinFactor -= 10;
+                }
+
+                if (velocityModifier.magnitude > 35)
+                    this.velocityAndSpinnInfo.text = "Velocity: 35 \nSpinn: " + spinFactor * -1;
+                else
+                    this.velocityAndSpinnInfo.text = "Velocity: " + velocityModifier.magnitude + "\nSpinn: " + spinFactor * -1;
 
                 if (Input.GetButtonDown("Fire1"))
                 {
-                    frisbee.velocity = throwDirection * powerOfThrow;
-                    frisbee.spin = new Vector3(0, -20, 0);
+                    frisbee.velocity = velocityModifier;//throwDirection * powerOfThrow;
+                    if (frisbee.velocity.magnitude > 35)
+                        frisbee.velocity = frisbee.velocity.normalized * 35;
+                    frisbee.spin = new Vector3(0, spinFactor, 0);
                     this.pickedUpFrisbee = false;
                     frisbee.idle = false;
-                
                 }
             }
-            else
-            {
-                
-            }
+            
             if (Input.GetButtonDown("Fire2"))
             {
                 //drop frisbee
@@ -127,7 +142,7 @@ public class PlayerMovement : MonoBehaviour {
             this.endOfLine = this.hand.transform.position;
             this.lineRenderer.SetPosition(1, endOfLine);
 
-            if (Input.GetButtonDown("Fire2"))
+            if (Input.GetButtonDown("Fire2") && frisbee.idle)
             {
                 float playerDistanceToFrisbee = (frisbee.transform.position - this.transform.position).magnitude;
                 if (playerDistanceToFrisbee < 1.5f)
@@ -141,27 +156,6 @@ public class PlayerMovement : MonoBehaviour {
                     //to far away from frisbee
                 }
             }
-        }
-
-        if (Input.GetKeyDown("1"))
-        {
-            this.anim.Play("Hit");
-
-        }
-        if (Input.GetKeyDown("2"))
-        {
-            this.anim.Play("Wary");
-
-        }
-        if (Input.GetKeyDown("3"))
-        {
-            this.anim.Play("Walk");
-
-        }
-        if (Input.GetKeyDown("4"))
-        {
-            this.anim.Play("FightStance");
-
         }
     }
 }

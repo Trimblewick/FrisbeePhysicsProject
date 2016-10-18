@@ -50,7 +50,7 @@ public class FrisbeeCylinderCollision : MonoBehaviour {
                     Vector3 moveFactor = this.transform.position - (lineOfAction.normalized * (this.radius + frisbee.getRadius() + 0.01f));
                     frisbee.transform.position = new Vector3(moveFactor.x, frisbee.transform.position.y, moveFactor.z);
 
-                    Vector3 e_n = Vector3.Cross(lineOfAction.normalized, frisbee.spin.normalized).normalized;//friction direction
+                    Vector3 e_n = Vector3.Cross(lineOfAction, Vector3.Cross(new Vector3(frisbee.velocity.x, 0, frisbee.velocity.z), lineOfAction)).normalized;//friction direction
                     float V_p = Vector3.Dot(frisbee.velocity, lineOfAction.normalized);//Caluculate velocity before collision in line of action v_rååå
                     float U_p = -e * V_p;//Velocity after collision in line of action
                     float deltaVU_p = U_p - V_p;
@@ -61,12 +61,12 @@ public class FrisbeeCylinderCollision : MonoBehaviour {
                     if (frisbee.spin.magnitude > frisbee.velocity.magnitude / frisbee.getRadius() - marginOfError && frisbee.spin.magnitude < frisbee.velocity.magnitude / frisbee.getRadius() + marginOfError)
                     {
                         V_n = (2 * (Vector3.Dot(frisbee.velocity, e_n)) + frisbee.getRadius() * frisbee.spin.magnitude) / 3;
-                        frisbee.spin = new Vector3(0, frisbee.spin.magnitude * Mathf.Exp(-10f * Time.deltaTime), 0);
+                        frisbee.spin = new Vector3(0, (Vector3.Dot(frisbee.velocity, e_n) + V_n)/frisbee.getRadius(), 0);
                     }
                     else
                     {
                         V_n = deltaVU_p * my;
-                        frisbee.spin = new Vector3(0, frisbee.spin.magnitude + 2 * my * deltaVU_p / frisbee.getRadius(), 0);
+                        frisbee.spin += (2 * my * deltaVU_p / frisbee.getRadius()) * Vector3.Cross(-lineOfAction.normalized, e_n);
                     }
                     
                     frisbee.velocity += deltaVU_p * lineOfAction.normalized + V_n * e_n;

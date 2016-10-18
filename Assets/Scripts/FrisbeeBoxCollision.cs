@@ -34,6 +34,7 @@ public class FrisbeeBoxCollision : MonoBehaviour {
         absLengths[2] = Mathf.Abs(lengths[2]);
 
         
+        
         if (absLengths[0] < this.transform.localScale.z * 0.5f)
         {
             if (absLengths[1] < this.transform.localScale.x * 0.5f)
@@ -43,12 +44,12 @@ public class FrisbeeBoxCollision : MonoBehaviour {
                     Vector3 lineOfAction;
                     Vector3 e_n;//friction direction
                     float boxRadius = 0;
-                    if (absLengths[0] > absLengths[1] && absLengths[0] > absLengths[2])
+                    if (absLengths[0] / this.transform.localScale.z > absLengths[1] / this.transform.localScale.x && absLengths[0] / this.transform.localScale.z > absLengths[2] / this.transform.localScale.y)
                     {
                         lineOfAction = lengths[0] > 0 ? this.transform.forward : -this.transform.forward;
                         boxRadius = this.transform.localScale.z * 0.5f;
                     }
-                    else if (absLengths[1] > absLengths[0] && absLengths[1] > absLengths[2])
+                    else if (absLengths[1] / this.transform.localScale.x  > absLengths[0] / this.transform.localScale.z && absLengths[1] / this.transform.localScale.x > absLengths[2] / this.transform.localScale.y)
                     {
                         lineOfAction = lengths[1] > 0 ? this.transform.right : -this.transform.right;
                         boxRadius = this.transform.localScale.x * 0.5f;
@@ -66,7 +67,9 @@ public class FrisbeeBoxCollision : MonoBehaviour {
                     float mag = Vector3.Dot(proj, lineOfAction.normalized);
                     frisbee.transform.position += mag * lineOfAction.normalized; //move the frisbee with the magnitude of proj in lineOfAction, #doyouevenengland
 
-                    e_n = Vector3.Cross(lineOfAction, frisbee.spin.normalized);
+                    e_n = Vector3.Cross(lineOfAction, Vector3.Cross(new Vector3(frisbee.velocity.x, 0, frisbee.velocity.z), lineOfAction)).normalized;
+
+
                     float V_p = Vector3.Dot(frisbee.velocity, lineOfAction.normalized);
                     float U_p = -e * V_p;
                     float deltaVU_p = U_p - V_p;
@@ -76,16 +79,13 @@ public class FrisbeeBoxCollision : MonoBehaviour {
                     float marginOfError = 1.0f;
                     if (frisbee.spin.magnitude > frisbee.velocity.magnitude / frisbee.getRadius() - marginOfError && frisbee.spin.magnitude < frisbee.velocity.magnitude / frisbee.getRadius() + marginOfError)
                     {
-                        Debug.Log("Rullvilkor BOX");
                         V_n = (2 * (Vector3.Dot(frisbee.velocity, e_n)) + frisbee.getRadius() * frisbee.spin.magnitude) / 3;
-                        frisbee.spin = new Vector3(0, frisbee.spin.magnitude * Mathf.Exp(-10f * Time.deltaTime), 0);
+                        frisbee.spin = new Vector3(0, (Vector3.Dot(frisbee.velocity, e_n) + V_n) / frisbee.getRadius(), 0);
                     }
                     else
                     {
-                        Debug.Log(frisbee.spin);
                         V_n = deltaVU_p * my;
-                        frisbee.spin = new Vector3(0, frisbee.spin.magnitude + 2 * my * deltaVU_p / frisbee.getRadius(), 0);
-                        Debug.Log(frisbee.spin);
+                        frisbee.spin += (2 * my * deltaVU_p / frisbee.getRadius()) * Vector3.Cross(-lineOfAction.normalized, e_n);
                     }
 
                     frisbee.velocity += deltaVU_p * lineOfAction.normalized + V_n * e_n;

@@ -4,16 +4,12 @@ using System.Collections;
 public class Goal : MonoBehaviour {
 
     private Frisbee frisbee;
-    //public GameObject goalCounter;
-    private int nbrOfGoals;
-    public TextMesh goalCounter;
-    private float goalCooldownTimer = 0.0f;//You can only make a goal every second
+
+    public TextMesh goalText;
 
     // Use this for initialization
     void Start () {
         frisbee = FindObjectOfType<Frisbee>();//get the frisbee object
-        
-        this.nbrOfGoals = 0;
         
     }
 	
@@ -28,8 +24,7 @@ public class Goal : MonoBehaviour {
         absLengths[0] = Mathf.Abs(lengths[0]);
         absLengths[1] = Mathf.Abs(lengths[1]);
         absLengths[2] = Mathf.Abs(lengths[2]);
-
-        this.goalCooldownTimer -= Time.deltaTime;
+        
 
         if (absLengths[0] < this.transform.localScale.z * 0.5f)
         {
@@ -38,13 +33,7 @@ public class Goal : MonoBehaviour {
                 if (absLengths[2] < this.transform.localScale.y * 0.5f)
                 {
                     //Goal achieved
-                    
-                    if (this.goalCooldownTimer < 0.0f)
-                    {
-                        this.goalCooldownTimer = 1.0f;
-                        this.nbrOfGoals++;
-                        goalCounter.text = "Goals: " + this.nbrOfGoals;
-                    }
+                    goalText.text = "GOAL!";
                 }
             }
         }
